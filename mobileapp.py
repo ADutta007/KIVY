@@ -5,6 +5,7 @@ from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from for_kivy import MyKivyFile
 from kivy_garden.mapview import MapView
+
 from plyer import gps
 
 
@@ -34,11 +35,9 @@ class forkivymd(MDScreen):
 class MyMainApp(MDApp):
 
 
-    def on_start(self):
-
-       gps.configure(on_location=self.on_gps_location)
-
-       gps.start()
+    def on_star(self):
+        gps.configure(on_location=self.on_gps_location)
+        gps.start()
 
     def on_gps_location(self,**kwargs):
 
@@ -56,6 +55,7 @@ class MyMainApp(MDApp):
         self.theme_cls.theme_style = "Dark"
 
         return self.root_widget
+
 
 
 if __name__ == "__main__":

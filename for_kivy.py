@@ -82,8 +82,7 @@ WindowManager:
         MDRaisedButton:
             text:"GET GPS"
             on_release:        
-                gps.configure(27,85)
-                gps.start(10,0.1)                
+                app.on_star()             
        
     
               
