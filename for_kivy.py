@@ -1,12 +1,18 @@
 MyKivyFile='''
 #: import MDRaisedButton kivymd.uix.button.MDRaisedButton
+#: import MDFillRoundFlatButton kivymd.uix.button.MDFillRoundFlatButton
 #: import MDTextField kivymd.uix.textfield.MDTextField
 #: import GridLayout kivymd.uix.gridlayout.GridLayout
+#: import BoxLayout kivymd.uix.boxlayout.BoxLayout
+#: import FloatLayout kivymd.uix.floatlayout.FloatLayout
+
 #: import MapView kivy_garden.mapview.MapView
 #: import MapMarker kivy_garden.mapview.MapMarker
 #: import storagepath plyer.storagepath
 #: import vibrator plyer.vibrator
 #: import gps plyer.gps
+#: import MDDialog kivymd.uix.dialog.MDDialog
+#: import Property kivy.properties.Property
 
 
 
@@ -67,22 +73,34 @@ WindowManager:
     name:"map"
     MapView:       
         id:ktm
-        lat:27.6922368
-        lon:85.3344256
+        lat:27.671613585742858
+        lon:85.36233186721803
         zoom:14
         double_tap_zoom:True
         MapMarkerPopup:
             source:"gps_logo.png"
-            lat:27.6922368
-            lon:85.3344256
+            lat:27.671613585742858
+            lon:85.36233186721803
             MDRaisedButton:
-                text:"Go bAck!"                       
-                on_release:    
-                    print(ktm.get_bbox())
+                text:"Get edge coordinates!"                       
+                on_release:
+                    
+                    root.show_bbox(str(ktm.get_bbox()))
+                
+                      
+    FloatLayout:            
         MDRaisedButton:
-            text:"GET GPS"
+            text:"Locate"
+            pos_hint:{"x":0.5,"y":0}
             on_release:        
-                app.on_star()             
+                app.on_star()
+        MDFillRoundFlatButton:
+            text:"Go Back!!"
+            pos_hint:{"x":0.35,"y":0}
+            color:0,1,0,0
+            on_release:
+                app.root.current="second"
+                root.manager.transition.direction = "right"                                            
        
     
               
