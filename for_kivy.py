@@ -7,7 +7,7 @@ MyKivyFile='''
 #: import storagepath plyer.storagepath
 #: import vibrator plyer.vibrator
 #: import gps plyer.gps
-#: import toast kivymd.toast.toast
+
 
 
 
@@ -22,12 +22,13 @@ WindowManager:
 
     name: "main"
     GridLayout:
+        cols:1
         orientation:"horizontal"
         padding:60                       
         MDTextField:
             hint_text:"Code"
             fill_color:(0,4,2,1)
-            pos_hint:{'center_x':0.5,'center_y':0.5}
+            pos_hint:{'center_x':0,'center_y':0.5}
             icon_left: 'key-variant'
             icon_right: 'eye-off'
             helper_text_mode: "on_focus"
@@ -38,6 +39,7 @@ WindowManager:
             text_color:(236/255.,98/255.,81/255.,1)  
             on_text_validate:
                 app.root.current = "second" if passw.text == "ashish" else "main"  
+                root.manager.transition.direction = "up"
             on_double_tap:
                 app.root.current = "second" if passw.text == "ashish" else "main"
             
@@ -77,10 +79,14 @@ WindowManager:
                 text:"Go bAck!"                       
                 on_release:    
                     print(ktm.get_bbox())
-                    gps.configure(27,85)
-                    gps.start()                
-                    
-            
+        MDRaisedButton:
+            text:"GET GPS"
+            on_release:        
+                gps.configure(27,85)
+                gps.start(10,0.1)                
+       
+    
+              
 <forkivymd>:
     name:"function"
     BoxLayout:
