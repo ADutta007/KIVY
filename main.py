@@ -12,8 +12,9 @@ from kivymd.uix.button import *
 from kivy.properties import Property
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
-
-
+from android.permissions import request_permissions, Permission
+request_permissions([Permission.ACCESS_COARSE_LOCATION,
+                            #Permission.ACCESS_FINE_LOCATION])
 
 
 
@@ -63,18 +64,23 @@ class forkivymd(MDScreen):
 class MyMainApp(MDApp):
 
 
-    def on_star(self):
+    def on_start(self):
         Logger.info("Called Start!")
-        gps.configure(on_location=self.on_gps_location)
+        gps.configure(on_location=self.on_location)
         gps.start()
 
-    def on_gps_location(self,**kwargs):
+    def on_location(self,**kwargs):
 
-       Logger.info("Called on Location")
-       Logger.info(kwargs)
+        Logger.info("Called on Location")
+        print('lat:{lat},lon:{lon}'.format(**kwargs))
+        #Logger.info(kwargs)
+        #self.outputs.item_strings=["","","",str(kwargs['lat']),"","","",str(kwargs['lon']),"","","",str(random.random())]
+
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.outputs = None
         self.root_widget = Builder.load_string(MyKivyFile)
 
     def build(self):

@@ -77,6 +77,8 @@ WindowManager:
         lon:85.36233186721803
         zoom:14
         double_tap_zoom:True
+        on_zoom:
+            self.zoom=10 if sel.zoom>14 else self.zoom
         MapMarkerPopup:
             source:"gps_logo.png"
             lat:27.671613585742858
@@ -93,7 +95,7 @@ WindowManager:
             text:"Locate"
             pos_hint:{"x":0.5,"y":0}
             on_release:        
-                app.on_star()
+                app.on_start()
         MDFillRoundFlatButton:
             text:"Go Back!!"
             pos_hint:{"x":0.35,"y":0}
