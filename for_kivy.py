@@ -1,6 +1,7 @@
 MyKivyFile = '''
 #: import MDRaisedButton kivymd.uix.button.MDRaisedButton
 #: import MDFillRoundFlatButton kivymd.uix.button.MDFillRoundFlatButton
+#: import MDFlatButton kivymd.uix.button.MDFlatButton
 #: import MDTextField kivymd.uix.textfield.MDTextField
 #: import GridLayout kivymd.uix.gridlayout.GridLayout
 #: import BoxLayout kivymd.uix.boxlayout.BoxLayout
@@ -16,13 +17,17 @@ MyKivyFile = '''
 #: include FirebaseLoginScreen/firebaseloginscreen.kv
 #: import FirebaseLoginScreen FirebaseLoginScreen.firebaseloginscreen.FirebaseLoginScreen
 #: import utils kivy.utils
-#: import Clock kivy.clock.Clock              
+#: import Clock kivy.clock.Clock  
+#: import MDApp kivymd.app.MDApp  
+#: import MDDialog kivymd.uix.dialog.MDDialog          
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
 
 
 
 WindowManager:
-    FirebaseLoginScreen:        
+    FirebaseLoginScreen:            
     FirstWindow:
+    AboutApp:
     
 <FirebaseLoginScreen>:
     name: "firebase_login_screen"
@@ -42,8 +47,91 @@ WindowManager:
     on_login_success:
         app.user_localId = self.localId
         app.user_idToken = self.idToken
-        app.root.current="navigate"
-        
+        app.root.current="aboutapp"
+ 
+ 
+<AboutApp>:
+    id: aboutapp
+    name: "aboutapp"
+    radius:[40,40,0,0]
+    md_bg_color: 59/255,21/255,17/255,1
+    ScreenManager:
+        id:sm
+        name:"sm"
+        transition: FadeTransition() 
+        Screen:            
+            name:"1"
+            Image:
+                source:"walk.gif"
+            FloatLayout:
+                #orientation: "vertical"
+                #padding: dp(0)
+                MDRaisedButton:
+                    background_color: 1,0,0,1
+                    text:"Next"
+                    pos_hint:{"x":.89,"y":0}                    
+                    on_release:
+                        sm.current="2"
+                        print(self.width)
+                MDRaisedButton:
+                    theme_text_color:"ContrastParentBackground"
+                    bg: app.theme_cls.primary_dark
+                    text:"Skip"
+                    on_release:
+                        app.root.current="navigate"        
+        Screen:
+            name:"2"
+            Image:
+                source:"walk.gif"
+            FloatLayout:
+                MDRaisedButton:
+                    md_bg_color: 1,0.3,0,1
+                    text:"Next"
+                    pos_hint:{"x":.89,"y":0}                    
+                    on_release:
+                        sm.current="3"
+                        print(self.width)
+                MDRaisedButton:
+                    theme_text_color:"ContrastParentBackground"
+                    bg: app.theme_cls.primary_dark
+                    text:"Skip"
+                    on_release:
+                        app.root.current="navigate" 
+                MDRaisedButton:
+                    theme_text_color:"ContrastParentBackground"
+                    bg: app.theme_cls.primary_dark
+                    text:"Previous"
+                    pos_hint:{"x":0,"y":0.94}
+                    on_release:
+                        sm.current="1" 
+        Screen:
+            name:"3"
+            Image:
+                source:"walk.gif"
+            FloatLayout:
+                MDRaisedButton:
+                    md_bg_color: 1,0.3,0,1
+                    text:"Next"
+                    pos_hint:{"x":.89,"y":0}                    
+                    on_release:
+                        app.root.current="navigate" 
+                MDRaisedButton:
+                    theme_text_color:"ContrastParentBackground"
+                    bg: app.theme_cls.primary_dark
+                    text:"Previous"
+                    pos_hint:{"x":0,"y":0.94}
+                    on_release:
+                        sm.current="2"
+            
+                
+           
+    
+    
+    
+       
+       
+       
+          
             
 <FirstWindow>:  
     on_pre_enter:
@@ -61,7 +149,7 @@ WindowManager:
         x: toolbar.height
 
         WindowManager:
-            id: screen_manager
+            id: screen_manager                                                                         
             
             GreenCoin:
                 name:"screen0"
@@ -73,8 +161,8 @@ WindowManager:
                 
             ThirdWindow:
             forkivymd: 
-            UserStatus:
-                name:"userstatus"    
+            UserStatus: 
+                
            
 
         MDNavigationDrawer:
@@ -161,16 +249,24 @@ WindowManager:
             text:"Center"
             on_release:
                 root.center_on(root.my_lat,root.my_lon)
+        MDRaisedButton:
+            text:"Back"
+            on_release:
+                root.parent.parent.current="screen0" 
+         
         
-                
+              
                                        
 <ThirdWindow>:
     name:"mapscreen"           
     ForMap:
         id:mapview
+        
+        
           
 <forkivymd>:
     name:"function"
+
     BoxLayout:
         orientation:"horizontal"
         spacing: dp(20)
@@ -179,13 +275,35 @@ WindowManager:
             text:"Vibrate"
             on_release:
                 vibrator.vibrate(time=2)
+        
                 
 <UserStatus>:
+    id:us
+    name:"userstatus"
+    MDToolbar:
+        title:"User Status"        
+        icon:"flip-to-back"
+        elevation:11
+        md_bg_color:1,0,0,1
+        pos_hint:{"top":1}        
+        on_action_button:
+            root.parent.current="screen0"
+        
     BoxLayout:
         id:userstatus
         orientation:"vertical"
-    #Image:
-        #source:"walk.gif"
+        MDRaisedButton:
+            text:"KANDA"
+            pos_hint:{"x":0.8,"y":0.8}
+            on_release:
+                root.set_value(1)
+            
+    
+        
+        Image:
+            #source:"walk.gif"
+            #source:"greencoin.png"
+            #pos:self.pos
         
         
 
