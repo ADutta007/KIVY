@@ -4,7 +4,7 @@ from kivy.clock import mainthread, Clock
 from kivy.lang import Builder
 from kivy.logger import Logger
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from numpy import random
@@ -17,12 +17,11 @@ from kivy.vector import Vector
 from kivymd.uix.dialog import MDDialog
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.label import MDLabel
-from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.button import MDRaisedButton, MDFlatButton
 from kivy.core.window import Window
 
 global marker_coord
 picture = {1: "new_nepal.png", 2: "greencoin.png"}
-
 
 # ran_coord=0
 # ----Java Classes For Google Login----#
@@ -40,23 +39,37 @@ class GreenCoin(MDScreen):
     pass
 
 
+class AboutApp(MDScreen):
+    def show_dialog(self):
+        self.my_dialog=MDDialog(title="About App",size_hint=[.8,.8],auto_dismiss=False,source="greencoin.png",
+                   buttons=[
+                    MDFlatButton(
+                        text="Skip", text_color=[0,1,1,1], on_release=self.skip
+                    ),
+                    MDFlatButton(
+                        text="Next", text_color=[1,0,1,1], on_release=self.next
+                    ),
+                ],)
+        self.my_dialog.open()
+
+    def skip(self,inst):
+        self.my_dialog.dismiss()
+        self.parent.current="navigate"
+    def next(self,inst):
+        pass
+
+
+
+class MDFlatButton(MDFlatButton):
+    width= NumericProperty(100)
+    height=NumericProperty(100)
+
+
 class FirstWindow(MDScreen):
     pass
 
 
-class UserStatus(MDScreen):
-    logo_value = 0
 
-    def set_value(self,args):
-        print(args)
-        if args == 1:
-            self.logo_value += 1
-            self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value), halign="center"))
-            print(self.logo_value)
-        if args == 2:
-            self.logo_value += 1
-            self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value), halign="right"))
-            print(self.logo_value)
         
 
 class GpsBlinker(MapMarker):
@@ -146,6 +159,7 @@ class ForMap(MapView):
             self.add_widget(self.marker[i])
 
             self.marker_image[i] = picture[random.randint(1, 3)]
+        #self.distance_gps_random()
 
     def distance_gps_random(self):
         global marker_coord
@@ -163,11 +177,13 @@ class ForMap(MapView):
             self.vector.append(i)
             self.vector[i] = (Vector(marker_coord[i].tolist())).distance(self.coord) * 10 ** 5
         print(self.vector)
+        a=''
         try:
             for i in range(len(marker_coord)):
                 print(len(self.vector))
 
                 if (self.vector[i]) < 100:
+                    a+=str(self.vector[i])
                     us=UserStatus()
                     self.comp_logo.append(i)
                     # vibrator.vibrate(time=2)
@@ -175,9 +191,10 @@ class ForMap(MapView):
 
                     self.comp_logo[i] = MapMarkerPopup(lat=float(marker_coord[i][0]), lon=float(marker_coord[i][1]),
                                                        source=self.marker_image[i])
-                    if self.marker_image[i] == "new_nepal.png":
+                    print(a)
+                    if (self.marker_image[i] == "new_nepal.png") & (a.count(str(self.vector[i]))==1):
                         us.set_value(1)
-                    if self.marker_image[i] == "greencoin.png":
+                    if (self.marker_image[i] == "greencoin.png") & (a.count(str(self.vector[i]))==1):
                         us.set_value(2)
 
                     self.add_widget(self.comp_logo[i])
@@ -199,6 +216,21 @@ class ForMap(MapView):
 
 class ThirdWindow(MDScreen):
     pass
+
+class UserStatus(MDScreen):
+    logo_value = 0
+
+    def set_value(self,args):
+        print(type(args))
+        self.ids.userstatus.add_widget(MDRaisedButton(text="..............",theme_text_color="Custom"))
+        if args == 2:
+            self.logo_value += 1
+            self.add_widget(MDLabel(text=str(self.logo_value+100), halign="center"))
+            print(self.logo_value)
+        if args == 1:
+            self.logo_value += 1
+            self.add_widget(MDLabel(text=str(self.logo_value+200), halign="center"))
+            print(self.logo_value)
 
 
 class WindowManager(ScreenManager):
