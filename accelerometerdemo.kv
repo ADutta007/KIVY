@@ -1,0 +1,27 @@
+#: import AccelerometerDemo accelerometerdemo.AccelerometerDemo
+<AccelerometerDemo>:
+    BoxLayout:
+        id:acc
+        orientation: 'vertical'
+        padding: 20
+
+        Graph:
+            size_hint_y: 0.8
+            id: graph_plot
+            xlabel:'Time'
+            ylabel:'Value'
+            y_grid_label: True
+            x_grid_label: True
+            padding: 5
+            xmin:0
+            xmax:100
+            ymin:-15
+            ymax:20
+
+        Button:
+            id: toggle_button
+            text: 'Start, hold phone parallel to ground'
+            size_hint_y: 0.2
+            on_press: root.do_toggle()
+
+

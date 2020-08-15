@@ -21,12 +21,13 @@ MyKivyFile = '''
 #: import MDApp kivymd.app.MDApp  
 #: import MDDialog kivymd.uix.dialog.MDDialog          
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
-
+#: import RiseInTransition kivy.uix.screenmanager.RiseInTransition
 
 
 WindowManager:
     FirebaseLoginScreen:            
     FirstWindow:
+        id:firstwindow
     AboutApp:
     
 <FirebaseLoginScreen>:
@@ -58,22 +59,32 @@ WindowManager:
     ScreenManager:
         id:sm
         name:"sm"
-        transition: FadeTransition() 
+        transition: RiseInTransition() 
         Screen:            
             name:"1"
-            Image:
-                source:"walk.gif"
-            FloatLayout:
-                #orientation: "vertical"
-                #padding: dp(0)
+            
+            RelativeLayout:
+                
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                canvas:
+                    Color:
+                        rgba: 59/255,21/255,17/255,1
+                    Rectangle:
+                        pos: 0, 0
+                        size: self.size
+                
+                Image:
+                    source:"walk.gif"
                 MDRaisedButton:
-                    background_color: 1,0,0,1
+                    rgba: 1,0,0,1
+                    pos_hint: {'right': 1, 'bottom': 1}
                     text:"Next"
-                    pos_hint:{"x":.89,"y":0}                    
+                    pos:self.pos                   
                     on_release:
                         sm.current="2"
                         print(self.width)
                 MDRaisedButton:
+                    pos_hint: {'left': 1, 'bottom': 1}
                     theme_text_color:"ContrastParentBackground"
                     bg: app.theme_cls.primary_dark
                     text:"Skip"
@@ -81,13 +92,23 @@ WindowManager:
                         app.root.current="navigate"        
         Screen:
             name:"2"
-            Image:
-                source:"walk.gif"
-            FloatLayout:
+            
+            RelativeLayout:
+                
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                canvas:
+                    Color:
+                        rgba: 59/255,21/255,17/255,1
+                    Rectangle:
+                        pos: 0, 0
+                        size: self.size
+                
+                Image:
+                    source:"walk.gif"
                 MDRaisedButton:
                     md_bg_color: 1,0.3,0,1
                     text:"Next"
-                    pos_hint:{"x":.89,"y":0}                    
+                    pos_hint: {'right': 1, 'bottom': 1}                   
                     on_release:
                         sm.current="3"
                         print(self.width)
@@ -95,31 +116,43 @@ WindowManager:
                     theme_text_color:"ContrastParentBackground"
                     bg: app.theme_cls.primary_dark
                     text:"Skip"
+                    pos_hint: {'left': 1, 'bottom': 1}
                     on_release:
                         app.root.current="navigate" 
                 MDRaisedButton:
                     theme_text_color:"ContrastParentBackground"
                     bg: app.theme_cls.primary_dark
+                    pos_hint: {'left': 1, 'top': 1}
                     text:"Previous"
-                    pos_hint:{"x":0,"y":0.94}
+                    pos_hint: {'left': 1, 'top': 1}
                     on_release:
                         sm.current="1" 
         Screen:
             name:"3"
-            Image:
-                source:"walk.gif"
-            FloatLayout:
+            
+            RelativeLayout:                
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                canvas:
+                    Color:
+                        rgba: 59/255,21/255,17/255,1
+                    Rectangle:
+                        pos: 0, 0
+                        size: self.size
+                MDLabel:
+                    text:"Screen3"
+                Image:
+                    source:"walk.gif"
                 MDRaisedButton:
                     md_bg_color: 1,0.3,0,1
                     text:"Next"
-                    pos_hint:{"x":.89,"y":0}                    
+                    pos_hint: {'right': 1, 'bottom': 1}                    
                     on_release:
                         app.root.current="navigate" 
                 MDRaisedButton:
                     theme_text_color:"ContrastParentBackground"
                     bg: app.theme_cls.primary_dark
                     text:"Previous"
-                    pos_hint:{"x":0,"y":0.94}
+                    pos_hint: {'left': 1, 'top': 1}
                     on_release:
                         sm.current="2"
             
@@ -160,7 +193,8 @@ WindowManager:
                     
                 
             ThirdWindow:
-            forkivymd: 
+                id: thirdwindow
+            ForEvent: 
             UserStatus: 
                 
            
@@ -198,7 +232,7 @@ WindowManager:
                 text: "For Events"
                 on_press:
                     root.nav_drawer.set_state("close")
-                    root.screen_manager.current = "function"
+                    root.screen_manager.current = "forevent"
 
             OneLineAvatarIconListItem:
                 text: "User Status"
@@ -207,8 +241,8 @@ WindowManager:
                     root.screen_manager.current = "userstatus"
 
         
-
 <ForMap>:      
+    id:mapview
     outer_opacity: 1
     lat:root.my_lat if root.my_lat>0 else 27.671585080600895
     lon:root.my_lon if root.my_lat>0 else 85.36235332489015
@@ -221,9 +255,9 @@ WindowManager:
         id:blinker   
         default_blink_size: 25
         blink_size: 25    
-        lat:root.my_lat if root.my_lat>0 else 27.671585080600895
+        lat: root.my_lat if root.my_lat>0 else 27.671585080600895
         lon:root.my_lon if root.my_lat>0 else 85.36235332489015
-        source:"green_gps_logo.png"
+        source:"circle_pos.gif"
          
         
             
@@ -232,18 +266,21 @@ WindowManager:
         orientation: 'vertical'
         spacing: dp(20)
         MDRaisedButton:
+            id:startgame
             text:"Start Game!!"      
             #pos_hint:{"x":0.5,"y":0.9}                 
             on_release:
                 root.zoom=18
                 root.show_points()
-                #disabled:True
+                self.disabled=True
+                Clock.schedule_once(lambda dt: root.quit_start(), 15)
                 #root.distance_gps_random()
                 Clock.schedule_interval(lambda dt: root.distance_gps_random(), 2)
                 #Clock.schedule_once(lambda dt: app.buffer_distance(), 5)
                 #app.buffer_distance()
             on_press:
                 root.clear_points()
+                #disabled:True
        
         MDRaisedButton:
             text:"Center"
@@ -253,33 +290,54 @@ WindowManager:
             text:"Back"
             on_release:
                 root.parent.parent.current="screen0" 
-         
+        MDRaisedButton:
+            id:quit
+            text:"Quit"
+            #disabled:False
+            on_release:
+                self.disabled=True
+                Clock.schedule_once(lambda dt: root.quit(), 2)
+                md_bg_color: (0,0,0,1)
+                #root.quit()
+                #app.root.ids.firstwindow.current="screen0"
+    
         
               
                                        
 <ThirdWindow>:
+    id:thirdwindow
     name:"mapscreen"           
     ForMap:
         id:mapview
         
         
           
-<forkivymd>:
-    name:"function"
+<ForEvent>:
+    id:forevent
+    name:"forevent"    
+    on_pre_enter:
+        a=(root.parent.parent.parent.ids.thirdwindow.ids.mapview.lat)
+        print (a)
 
-    BoxLayout:
-        orientation:"horizontal"
-        spacing: dp(20)
-        
+    MapView:
+        lat: self.parent.a
+        lon: 85.36235332489015 
+        zoom:5
+        double_tap_zoom: True
+        MapMarker:               
+            lat:  27.671585080600895
+            lon:  85.36235332489015
+            source:"circle_pos.gif"
         MDRaisedButton:
-            text:"Vibrate"
+            text:"parent_prob"
             on_release:
-                vibrator.vibrate(time=2)
-        
+                print(app.root.ids.firstwindow.ids.thirdwindow.ids.mapview.lat)
+            
                 
 <UserStatus>:
     id:us
     name:"userstatus"
+    
     MDToolbar:
         title:"User Status"        
         icon:"flip-to-back"
@@ -289,21 +347,11 @@ WindowManager:
         on_action_button:
             root.parent.current="screen0"
         
-    BoxLayout:
-        id:userstatus
-        orientation:"vertical"
-        MDRaisedButton:
-            text:"KANDA"
-            pos_hint:{"x":0.8,"y":0.8}
-            on_release:
-                root.set_value(1)
-            
     
+    FloatLayout:
+        id:userstatus
+        orientation:"vertical"                  
         
-        Image:
-            #source:"walk.gif"
-            #source:"greencoin.png"
-            #pos:self.pos
         
         
 

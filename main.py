@@ -23,6 +23,7 @@ from kivy.core.window import Window
 global marker_coord
 picture = {1: "new_nepal.png", 2: "greencoin.png"}
 
+
 # ran_coord=0
 # ----Java Classes For Google Login----#
 # Gso= autoclass('com.google.android.gms.auth.api.signin.GoogleSignInOptions')
@@ -41,36 +42,33 @@ class GreenCoin(MDScreen):
 
 class AboutApp(MDScreen):
     def show_dialog(self):
-        self.my_dialog=MDDialog(title="About App",size_hint=[.8,.8],auto_dismiss=False,source="greencoin.png",
-                   buttons=[
-                    MDFlatButton(
-                        text="Skip", text_color=[0,1,1,1], on_release=self.skip
-                    ),
-                    MDFlatButton(
-                        text="Next", text_color=[1,0,1,1], on_release=self.next
-                    ),
-                ],)
+        self.my_dialog = MDDialog(title="About App", size_hint=[.8, .8], auto_dismiss=False, source="greencoin.png",
+                                  buttons=[
+                                      MDFlatButton(
+                                          text="Skip", text_color=[0, 1, 1, 1], on_release=self.skip
+                                      ),
+                                      MDFlatButton(
+                                          text="Next", text_color=[1, 0, 1, 1], on_release=self.next
+                                      ),
+                                  ], )
         self.my_dialog.open()
 
-    def skip(self,inst):
+    def skip(self, inst):
         self.my_dialog.dismiss()
-        self.parent.current="navigate"
-    def next(self,inst):
+        self.parent.current = "navigate"
+
+    def next(self, inst):
         pass
 
 
-
 class MDFlatButton(MDFlatButton):
-    width= NumericProperty(100)
-    height=NumericProperty(100)
+    width = NumericProperty(100)
+    height = NumericProperty(100)
 
 
 class FirstWindow(MDScreen):
     pass
 
-
-
-        
 
 class GpsBlinker(MapMarker):
     def blink(self):
@@ -96,6 +94,7 @@ class ForMap(MapView):
 
     def __init__(self, **kw):
         super().__init__(**kw)
+        self.flag=False
 
         self.chck = 0
         try:
@@ -159,10 +158,11 @@ class ForMap(MapView):
             self.add_widget(self.marker[i])
 
             self.marker_image[i] = picture[random.randint(1, 3)]
-        #self.distance_gps_random()
+        # self.distance_gps_random()
 
     def distance_gps_random(self):
         global marker_coord
+
         self.vector = []
 
         print('lat:', self.my_lat)
@@ -177,25 +177,26 @@ class ForMap(MapView):
             self.vector.append(i)
             self.vector[i] = (Vector(marker_coord[i].tolist())).distance(self.coord) * 10 ** 5
         print(self.vector)
-        a=''
+
         try:
             for i in range(len(marker_coord)):
                 print(len(self.vector))
 
                 if (self.vector[i]) < 100:
-                    a+=str(self.vector[i])
-                    us=UserStatus()
+                    a = str(self.vector[i])
+                    b.append(a)
+                    us = UserStatus()
                     self.comp_logo.append(i)
                     # vibrator.vibrate(time=2)
                     self.remove_widget(self.marker[i])
 
                     self.comp_logo[i] = MapMarkerPopup(lat=float(marker_coord[i][0]), lon=float(marker_coord[i][1]),
                                                        source=self.marker_image[i])
-                    print(a)
-                    if (self.marker_image[i] == "new_nepal.png") & (a.count(str(self.vector[i]))==1):
-                        us.set_value(1)
-                    if (self.marker_image[i] == "greencoin.png") & (a.count(str(self.vector[i]))==1):
-                        us.set_value(2)
+                    print("aaaaaaaaaaaaaa"+str(b.count(str(self.vector[i]))))
+                    if (self.marker_image[i] == "new_nepal.png") & (b.count(str(self.vector[i])) == 3):
+                        us.nnp()
+                    if (self.marker_image[i] == "greencoin.png") & (b.count(str(self.vector[i])) == 3):
+                        us.gc()
 
                     self.add_widget(self.comp_logo[i])
 
@@ -212,25 +213,46 @@ class ForMap(MapView):
             for j in range(len(self.comp_logo)):
                 print("greencoins" + str(len(self.comp_logo)))
                 self.remove_widget(self.comp_logo[j])
-
-
+    def quit(self):
+       self.ids.quit.disabled=False
+    def quit_start(self):
+        self.ids.startgame.disabled=False
+b=[]
 class ThirdWindow(MDScreen):
     pass
 
-class UserStatus(MDScreen):
-    logo_value = 0
 
-    def set_value(self,args):
+lv = 1
+
+
+class UserStatus(MDScreen):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        #self.add_widget(MDRaisedButton(text="..............",theme_text_color="Custom"))
+
+    logo_value = lv
+    lv += 1
+
+    def set_value(self, args):
         print(type(args))
-        self.ids.userstatus.add_widget(MDRaisedButton(text="..............",theme_text_color="Custom"))
+        # self.ids.userstatus.add_widget(MDRaisedButton(text="..............",theme_text_color="Custom"))
         if args == 2:
             self.logo_value += 1
-            self.add_widget(MDLabel(text=str(self.logo_value+100), halign="center"))
+            self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value + 100), halign="center"))
             print(self.logo_value)
         if args == 1:
-            self.logo_value += 1
-            self.add_widget(MDLabel(text=str(self.logo_value+200), halign="center"))
+            # self.logo_value += 1
+            self.add_widget(MDLabel(text=str(self.logo_value + 200), halign="center", valign="center"))
             print(self.logo_value)
+
+    def nnp(self):
+        print("radikoban")
+        self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value + 100), halign="center"))
+
+    def gc(self):
+        print("laudalasun")
+        app=App.get_running_app()
+        self.add_widget(MDRaisedButton(text=str(self.logo_value + 200)))
 
 
 class WindowManager(ScreenManager):
@@ -241,7 +263,7 @@ class SecondWindowManager(ScreenManager):
     pass
 
 
-class forkivymd(MDScreen):
+class ForEvent(MDScreen):
     pass
 
 
