@@ -16,6 +16,7 @@ from kivy.animation import Animation
 from kivy.vector import Vector
 from kivymd.uix.dialog import MDDialog
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.camera import Camera
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDRaisedButton, MDFlatButton
 from kivy.core.window import Window
@@ -39,50 +40,13 @@ class ContentNavigationDrawer(BoxLayout):
 class GreenCoin(MDScreen):
     pass
 
-
 class AboutApp(MDScreen):
-    def show_dialog(self):
-        self.my_dialog = MDDialog(title="About App", size_hint=[.8, .8], auto_dismiss=False, source="greencoin.png",
-                                  buttons=[
-                                      MDFlatButton(
-                                          text="Skip", text_color=[0, 1, 1, 1], on_release=self.skip
-                                      ),
-                                      MDFlatButton(
-                                          text="Next", text_color=[1, 0, 1, 1], on_release=self.next
-                                      ),
-                                  ], )
-        self.my_dialog.open()
+    pass
 
-    def skip(self, inst):
-        self.my_dialog.dismiss()
-        self.parent.current = "navigate"
-
-    def next(self, inst):
-        pass
-
-
-class MDFlatButton(MDFlatButton):
-    width = NumericProperty(100)
-    height = NumericProperty(100)
 
 
 class FirstWindow(MDScreen):
     pass
-
-
-class GpsBlinker(MapMarker):
-    def blink(self):
-        # Animation that changes the blink size and opacity
-        anim = Animation(outer_opacity=0, blink_size=50)
-        # When the animation completes, reset the animation, then repeat
-        anim.bind(on_complete=self.reset)
-        anim.start(self)
-
-    def reset(self, *args):
-        self.outer_opacity = 1
-        self.blink_size = self.default_blink_size
-        self.blink()
-
 
 class ForMap(MapView):
     gps_location = StringProperty()
@@ -135,12 +99,12 @@ class ForMap(MapView):
         global marker_coord
         self.c = MapView.get_bbox(self)
         self.arr = np.array(self.c)
-        print(self.arr)
+        #print(self.arr)
         self.lat_arr = np.random.uniform(low=self.arr[0], high=self.arr[2], size=(5))
         self.lon_arr = np.random.uniform(low=self.arr[1], high=self.arr[3], size=(5))
         marker_coord = (np.dstack((self.lat_arr, self.lon_arr))).reshape(-1, 2)
-        print(marker_coord)
-        print(len(marker_coord))
+        #print(marker_coord)
+        #print(len(marker_coord))
 
     def show_points(self):
         global marker_coord
@@ -148,9 +112,9 @@ class ForMap(MapView):
         self.comp_logo = []
         self.marker_image = []
         self.random_points()
-        print(marker_coord)
+        #print(marker_coord)
         for i in range(len(marker_coord)):
-            print("muji")
+            #print("muji")
             self.marker.append(i)
             self.marker_image.append(i)
             self.marker[i] = MapMarkerPopup(lat=float(marker_coord[i][0]), lon=float(marker_coord[i][1]),
@@ -161,18 +125,18 @@ class ForMap(MapView):
         # self.distance_gps_random()
 
     def distance_gps_random(self):
-        global marker_coord
+        global marker_coord, gncn, nnpal
 
         self.vector = []
 
-        print('lat:', self.my_lat)
+        print('lat:', self.my_lat,"lon:", self.my_lon)
 
         if self.my_lat != 0:
             self.coord = Vector(self.my_lat, self.my_lon)
         else:
             self.coord = Vector(27.671585080600895, 85.36235332489015)
-        print(self.coord)
-        print(marker_coord)
+        #print(self.coord)
+        #print(marker_coord)
         for i in range(len(marker_coord)):
             self.vector.append(i)
             self.vector[i] = (Vector(marker_coord[i].tolist())).distance(self.coord) * 10 ** 5
@@ -183,22 +147,29 @@ class ForMap(MapView):
                 print(len(self.vector))
 
                 if (self.vector[i]) < 100:
-                    a = str(self.vector[i])
+                    a = str(int(self.vector[i])/10)
                     b.append(a)
                     us = UserStatus()
                     self.comp_logo.append(i)
-                    # vibrator.vibrate(time=2)
+
                     self.remove_widget(self.marker[i])
 
                     self.comp_logo[i] = MapMarkerPopup(lat=float(marker_coord[i][0]), lon=float(marker_coord[i][1]),
                                                        source=self.marker_image[i])
-                    print("aaaaaaaaaaaaaa"+str(b.count(str(self.vector[i]))))
-                    if (self.marker_image[i] == "new_nepal.png") & (b.count(str(self.vector[i])) == 3):
-                        us.nnp()
-                    if (self.marker_image[i] == "greencoin.png") & (b.count(str(self.vector[i])) == 3):
-                        us.gc()
-
+                    print("aaaaaaaaaaaaaa"+str(b.count(a)))
                     self.add_widget(self.comp_logo[i])
+                    if (self.marker_image[i] == "new_nepal.png") & (b.count(a) == 5):
+                        #vibrator.vibrate(time=2)
+                        nnpal= nnpal + 1
+                        cam=Camera(play=True)
+
+                        print(str(nnpal)+"!!!!!!!!!!!!!!!!!")
+                    if (self.marker_image[i] == "greencoin.png") & (b.count(a) == 5):
+                        #vibrator.vibrate(time=2)
+                        gncn= gncn +1
+                        cam=Camera(play=True)
+
+                        print(str(gncn)+"------------------")
 
                     # self.vector.pop(i)
                     # marker_coord = np.delete(marker_coord, i, 0)
@@ -218,41 +189,35 @@ class ForMap(MapView):
     def quit_start(self):
         self.ids.startgame.disabled=False
 b=[]
+nnpal=0
+gncn=0
 class ThirdWindow(MDScreen):
     pass
 
-
-lv = 1
 
 
 class UserStatus(MDScreen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        #self.add_widget(MDRaisedButton(text="..............",theme_text_color="Custom"))
 
-    logo_value = lv
-    lv += 1
-
-    def set_value(self, args):
-        print(type(args))
-        # self.ids.userstatus.add_widget(MDRaisedButton(text="..............",theme_text_color="Custom"))
-        if args == 2:
-            self.logo_value += 1
-            self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value + 100), halign="center"))
-            print(self.logo_value)
-        if args == 1:
-            # self.logo_value += 1
-            self.add_widget(MDLabel(text=str(self.logo_value + 200), halign="center", valign="center"))
-            print(self.logo_value)
 
     def nnp(self):
+        global nnpal
+        print("nnp ko value in ustatus"+str(nnpal))
         print("radikoban")
-        self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value + 100), halign="center"))
-
+        #self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value + 100), halign="center"))
+        self.ids.nnp_score.text=str(nnpal)
+        print(UserStatus.ids)
     def gc(self):
+        global gncn
+        print("gc ko value in ustatus"+str(gncn))
         print("laudalasun")
-        app=App.get_running_app()
-        self.add_widget(MDRaisedButton(text=str(self.logo_value + 200)))
+        print(self.ids)
+        self.ids.gc_score.text=str(gncn)
+        print(UserStatus.ids)
+    def sol_chck(self):
+        self.ids.label_score.text="haaeraam"
+        #self.add_widget(MDRaisedButton(text=str(self.logo_value + 200)))
 
 
 class WindowManager(ScreenManager):
