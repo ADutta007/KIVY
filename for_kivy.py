@@ -273,9 +273,9 @@ WindowManager:
                 root.zoom=18
                 root.show_points()
                 self.disabled=True
-                Clock.schedule_once(lambda dt: root.quit_start(), 15)
+                Clock.schedule_once(lambda dt: root.quit_start(), 5)
                 #root.distance_gps_random()
-                Clock.schedule_interval(lambda dt: root.distance_gps_random(), 2)
+                Clock.schedule_interval(lambda dt: root.distance_gps_random(), .5)
                 #Clock.schedule_once(lambda dt: app.buffer_distance(), 5)
                 #app.buffer_distance()
             on_press:
@@ -290,16 +290,16 @@ WindowManager:
             text:"Back"
             on_release:
                 root.parent.parent.current="screen0" 
-        MDRaisedButton:
-            id:quit
-            text:"Quit"
-            #disabled:False
-            on_release:
-                self.disabled=True
-                Clock.schedule_once(lambda dt: root.quit(), 2)
-                md_bg_color: (0,0,0,1)
-                #root.quit()
-                #app.root.ids.firstwindow.current="screen0"
+        #MDRaisedButton:
+        #    id:quit
+        #    text:"Quit"
+        #    #disabled:False
+        #    on_release:
+        #        self.disabled=True
+        #        Clock.schedule_once(lambda dt: root.quit(), 2)
+        #        md_bg_color: (0,0,0,1)
+        #        #root.quit()
+        #        #app.root.ids.firstwindow.current="screen0"
     
         
               
@@ -319,24 +319,22 @@ WindowManager:
         a=(root.parent.parent.parent.ids.thirdwindow.ids.mapview.lat)
         print (a)
 
-    MapView:
-        lat: self.parent.a
-        lon: 85.36235332489015 
-        zoom:5
-        double_tap_zoom: True
-        MapMarker:               
-            lat:  27.671585080600895
-            lon:  85.36235332489015
-            source:"circle_pos.gif"
-        MDRaisedButton:
-            text:"parent_prob"
-            on_release:
-                print(app.root.ids.firstwindow.ids.thirdwindow.ids.mapview.lat)
-            
-                
+    MapView:  
+        MDRaisedButton:                                
+            text:"Back"                                
+            on_release:                                
+                root.parent.current="screen0"    
+       
+                   
 <UserStatus>:
     id:us
     name:"userstatus"
+    on_pre_enter:
+        root.nnp()
+        root.gc()
+    
+    
+    
     
     MDToolbar:
         title:"User Status"        
@@ -348,12 +346,41 @@ WindowManager:
             root.parent.current="screen0"
         
     
-    FloatLayout:
+    FloatLayout:                
+        orientation: vertical
         id:userstatus
-        orientation:"vertical"                  
+        orientation:"vertical"   
+        
+        MDLabel:
+            id:gc_score            
+            #halign:"center"
+            #valign:"center"
+            pos_hint:{"x":.55,"y":0.05}
+        MDLabel:
+            id: nnp_score
+            pos_hint:{"x":.55,"y":-0.015}
+        Image:             
+            source:"new_nepal.png"     
+            pos_hint: {"x":0.45,"y":0.45}
+            allow_stretch: True
+            keep_ratio:False
+            size_hint: None, None
+            size: 60,60     
+        Image:             
+            source:"greencoin.png"     
+            pos_hint: {"x":0.45,"y":0.53}
+            allow_stretch: True
+            keep_ratio:False
+            size_hint: None, None
+            size: 60,60     
+           
+           
+           
+        
+
+                   
         
         
         
 
 '''
-
