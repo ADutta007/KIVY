@@ -1,25 +1,9 @@
 MyKivyFile = '''
-#: import MDRaisedButton kivymd.uix.button.MDRaisedButton
-#: import MDFillRoundFlatButton kivymd.uix.button.MDFillRoundFlatButton
-#: import MDFlatButton kivymd.uix.button.MDFlatButton
-#: import MDTextField kivymd.uix.textfield.MDTextField
-#: import GridLayout kivymd.uix.gridlayout.GridLayout
-#: import BoxLayout kivymd.uix.boxlayout.BoxLayout
-#: import FloatLayout kivymd.uix.floatlayout.FloatLayout
-#: import MDLabel kivymd.uix.label.MDLabel
-#: import MapView kivy_garden.mapview.MapView
-#: import MapMarker kivy_garden.mapview.MapMarker
-#: import storagepath plyer.storagepath
-#: import vibrator plyer.vibrator
-#: import gps plyer.gps
-#: import MDDialog kivymd.uix.dialog.MDDialog
-#: import Property kivy.properties.Property
+
 #: include FirebaseLoginScreen/firebaseloginscreen.kv
 #: import FirebaseLoginScreen FirebaseLoginScreen.firebaseloginscreen.FirebaseLoginScreen
 #: import utils kivy.utils
-#: import Clock kivy.clock.Clock  
-#: import MDApp kivymd.app.MDApp  
-#: import MDDialog kivymd.uix.dialog.MDDialog          
+#: import Clock kivy.clock.Clock          
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
 #: import RiseInTransition kivy.uix.screenmanager.RiseInTransition
 
@@ -167,6 +151,7 @@ WindowManager:
           
             
 <FirstWindow>:  
+    id:firstwindow
     on_pre_enter:
         print("keraaando")  
     name:"navigate"
@@ -222,7 +207,7 @@ WindowManager:
                 text: "Treasure Hunt!"  
                 IconLeftWidget:
                     icon:"gamepad"
-                    on_touch_down:
+                    on_press:
                         root.nav_drawer.set_state("close")
                         root.screen_manager.current = "mapscreen"                   
                 
@@ -271,11 +256,13 @@ WindowManager:
             #pos_hint:{"x":0.5,"y":0.9}                 
             on_release:
                 root.zoom=18
-                root.show_points()
+                
                 self.disabled=True
                 Clock.schedule_once(lambda dt: root.quit_start(), 5)
-                #root.distance_gps_random()
+                root.random_points()
+                root.show_points()                
                 Clock.schedule_interval(lambda dt: root.distance_gps_random(), .5)
+                #root.distance_meet()
                 #Clock.schedule_once(lambda dt: app.buffer_distance(), 5)
                 #app.buffer_distance()
             on_press:
@@ -290,27 +277,17 @@ WindowManager:
             text:"Back"
             on_release:
                 root.parent.parent.current="screen0" 
-        #MDRaisedButton:
-        #    id:quit
-        #    text:"Quit"
-        #    #disabled:False
-        #    on_release:
-        #        self.disabled=True
-        #        Clock.schedule_once(lambda dt: root.quit(), 2)
-        #        md_bg_color: (0,0,0,1)
-        #        #root.quit()
-        #        #app.root.ids.firstwindow.current="screen0"
-    
-        
-              
-                                       
+        MDRaisedButton:
+            text:"Restart"
+            on_release:
+                app.recreate()
+         
+                                   
 <ThirdWindow>:
     id:thirdwindow
-    name:"mapscreen"           
+    name:"mapscreen"       
     ForMap:
         id:mapview
-        
-        
           
 <ForEvent>:
     id:forevent
@@ -319,11 +296,23 @@ WindowManager:
         a=(root.parent.parent.parent.ids.thirdwindow.ids.mapview.lat)
         print (a)
 
-    MapView:  
+    MapView: 
+    BoxLayout:
+        id:random
+        orientation: 'vertical'
+        spacing: dp(20) 
         MDRaisedButton:                                
             text:"Back"                                
             on_release:                                
-                root.parent.current="screen0"    
+                root.parent.current="screen0"   
+        MDRaisedButton:
+            text:"Camera"
+            on_release:
+                root.open_cam() 
+        MDRaisedButton:
+            text:"Restart"
+            on_release:
+                app.recreate()
        
                    
 <UserStatus>:
@@ -338,12 +327,11 @@ WindowManager:
     
     MDToolbar:
         title:"User Status"        
-        icon:"flip-to-back"
         elevation:11
-        md_bg_color:1,0,0,1
+        md_bg_color:0,1,0,1
         pos_hint:{"top":1}        
-        on_action_button:
-            root.parent.current="screen0"
+        left_action_items: [["keyboard-backspace", lambda x: root.change_it()]]
+         
         
     
     FloatLayout:                
