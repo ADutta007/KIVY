@@ -6,6 +6,7 @@ MyKivyFile = '''
 #: import Clock kivy.clock.Clock          
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
 #: import RiseInTransition kivy.uix.screenmanager.RiseInTransition
+#: import random numpy.random
 
 
 WindowManager:
@@ -26,6 +27,7 @@ WindowManager:
 
     
     web_api_key: "AIzaSyB-nrusoHjlBoJstkDk0Inpc38OvLDvLYM"
+    debug: True
     primary_color: utils.get_color_from_hex("#EE682A")
     secondary_color: utils.get_color_from_hex("#060809")
     tertiary_color: (.25, .25, .25, 1)
@@ -33,6 +35,7 @@ WindowManager:
         app.user_localId = self.localId
         app.user_idToken = self.idToken
         app.root.current="aboutapp"
+        print(root.refresh_token_file)
  
  
 <AboutApp>:
@@ -140,20 +143,12 @@ WindowManager:
                     on_release:
                         sm.current="2"
             
-                
-           
-    
-    
-    
-       
-       
+
        
           
             
 <FirstWindow>:  
     id:firstwindow
-    on_pre_enter:
-        print("keraaando")  
     name:"navigate"
     MDToolbar:
         id: toolbar
@@ -166,16 +161,19 @@ WindowManager:
     NavigationLayout:
         x: toolbar.height
 
-        WindowManager:
+        ScreenManager:
             id: screen_manager                                                                         
             
             GreenCoin:
                 name:"screen0"
+                id:greencoin
                 MDFillRoundFlatButton:
                     text:"GREENCOINS"
                     icon:"greencoin.png"
                     pos_hint:{"center_x":0.5,"center_y":0.5}  
-                    
+                    on_release:
+                        self.parent.md_bg_color=random.randint(0,255)/255,random.randint(0,255)/255,random.randint(0,255)/255,random.randint(0,255)/255
+                      
                 
             ThirdWindow:
                 id: thirdwindow
@@ -260,8 +258,11 @@ WindowManager:
                 self.disabled=True
                 Clock.schedule_once(lambda dt: root.quit_start(), 5)
                 root.random_points()
-                root.show_points()                
-                Clock.schedule_interval(lambda dt: root.distance_gps_random(), .5)
+                root.show_points()          
+                root.schedule() 
+                #root.distance_gps_random()
+                #event=Clock.schedule_interval(lambda dt: root.distance_gps_random(), 5)
+                #event()
                 #root.distance_meet()
                 #Clock.schedule_once(lambda dt: app.buffer_distance(), 5)
                 #app.buffer_distance()
@@ -276,11 +277,14 @@ WindowManager:
         MDRaisedButton:
             text:"Back"
             on_release:
-                root.parent.parent.current="screen0" 
+                app.root.ids.firstwindow.ids.screen_manager.current="screen0" 
+                print(root.parent.parent)
         MDRaisedButton:
             text:"Restart"
             on_release:
                 app.recreate()
+                root.unschedule()
+                
          
                                    
 <ThirdWindow>:
@@ -330,7 +334,7 @@ WindowManager:
         elevation:11
         md_bg_color:0,1,0,1
         pos_hint:{"top":1}        
-        left_action_items: [["keyboard-backspace", lambda x: root.change_it()]]
+        left_action_items: [["arrow-left", lambda x: root.change_it()]]
          
         
     

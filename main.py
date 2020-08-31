@@ -1,5 +1,6 @@
 from kivy.app import App
 import numpy as np
+import json
 from kivy.clock import mainthread, Clock
 from kivy.lang import Builder
 from kivy.logger import Logger
@@ -18,20 +19,21 @@ from kivymd.uix.dialog import MDDialog
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.factory import Factory
+import requests
+from akivymd.uix.statusbarcolor import change_statusbar_color
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDRaisedButton, MDFlatButton
 from kivy.core.window import Window
-
+#import autoclass
+from jnius import autoclass
 global marker_coord
 picture = {1: "new_nepal.png", 2: "greencoin.png"}
-#marker_coord=[]
-
+# marker_coord=[]
 # ran_coord=0
 # ----Java Classes For Google Login----#
-# Gso= autoclass('com.google.android.gms.auth.api.signin.GoogleSignInOptions')
-# GsoBuilder= autoclass('com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder')
-# GSignIn= autoclass('com.google.android.gms.auth.api.signin.GoogleSignIn')
-# ApiException= autoclass('com.google.android.gms.common.api.ApiException')
+
+
+
 
 class ContentNavigationDrawer(BoxLayout):
     screen_manager = ObjectProperty()
@@ -63,7 +65,7 @@ class ForMap(MapView):
         super().__init__(**kw)
         self.flag = False
         self.chck = 0
-        #self.random_points()
+        # self.random_points()
 
         try:
             from android.permissions import request_permissions, Permission
@@ -117,19 +119,18 @@ class ForMap(MapView):
         self.marker = []
         self.comp_logo = []
         self.marker_image = []
-        #self.random_points()
+        # self.random_points()
         # print(marker_coord)
         for i in range(len(marker_coord)):
             # print("muji")
             self.marker.append(i)
             self.marker_image.append(i)
-            self.marker[i] = MapMarkerPopup(lat=float(marker_coord[i][0]), lon=float(marker_coord[i][1]),
-                                            source="gps_logo.png")
+            self.marker[i] = MapMarker(lat=float(marker_coord[i][0]), lon=float(marker_coord[i][1]),
+                                       source="gps_logo.png")
             self.add_widget(self.marker[i])
 
             self.marker_image[i] = picture[random.randint(1, 3)]
         # self.distance_gps_random()
-
 
     def distance_gps_random(self):
         global marker_coord, gncn, nnpal
@@ -147,12 +148,26 @@ class ForMap(MapView):
             for i in range(len(marker_coord)):
                 self.vector.append(i)
                 self.vector[i] = (Vector(marker_coord[i].tolist())).distance(self.coord) * 10 ** 5
-                print(self.vector,len(marker_coord))
+                print(self.vector, len(marker_coord))
                 if (self.vector[i]) < 100:
                     self.distance_meet(i)
-        except:
-            print("vaaka")
-    def distance_meet(self,i):
+                    marker_coord = np.delete(marker_coord, i, 0)
+                    self.dialog = MDDialog(
+                    text="Discard draft?",
+                    buttons=[
+                        MDRaisedButton(
+                            text="CANCEL"
+                        ),
+                        MDRaisedButton(
+                            text="DISCARD"
+                        ),
+                    ],
+                )
+                    self.dialog.open()
+        except IndexError as e:
+            print(e)
+
+    def distance_meet(self, i):
         global marker_coord, gncn, nnpal
 
         self.comp_logo.append(i)
@@ -163,23 +178,26 @@ class ForMap(MapView):
                                         source=self.marker_image[i])
         print("kando!!!!!!")
 
-        self.add_widget(self.marker[i])
+        Clock.schedule_once(lambda dt: (self.add_widget(self.marker[i])), 2)
         if (self.marker_image[i] == "new_nepal.png"):
             # vibrator.vibrate(time=2)
             nnpal = nnpal + 1
             cam = Camera(resolution=(320, 240), play=True)
-            self.add_widget(cam)
-            #self.vector.pop(i)
-            marker_coord = np.delete(marker_coord, i, 0)
+
+
+            # self.add_widget(cam)
+            # self.vector.pop(i)
+            # marker_coord = np.delete(marker_coord, i, 0)
         elif (self.marker_image[i] == "greencoin.png"):
             # vibrator.vibrate(time=2)
             gncn = gncn + 1
             cam = Camera(resolution=(320, 240), play=True)
-            self.add_widget(cam)
-            #self.vector.pop(i)
-            marker_coord = np.delete(marker_coord, i, 0)
-                # self.vector.pop(i)
-                # marker_coord = np.delete(marker_coord, i, 0)
+
+            # self.add_widget(cam)
+            # self.vector.pop(i)
+            # marker_coord = np.delete(marker_coord, i, 0)
+            # self.vector.pop(i)
+            # marker_coord = np.delete(marker_coord, i, 0)
 
     def clear_points(self):
         self.chck += 1
@@ -191,11 +209,18 @@ class ForMap(MapView):
                 print("greencoins" + str(len(self.comp_logo)))
                 self.remove_widget(self.comp_logo[j])
 
-    def quit(self):
-        self.ids.quit.disabled = False
-
     def quit_start(self):
         self.ids.startgame.disabled = False
+
+    def schedule(self):
+        self.event = Clock.schedule_interval(lambda dt: self.distance_gps_random(), 5)
+        self.event()
+
+    def unschedule(self):
+        try:
+            self.event.cancel()
+        except AttributeError as e:
+            print(e)
 
 
 b = []
@@ -214,7 +239,7 @@ class UserStatus(MDScreen):
     def nnp(self):
         global nnpal
         print("nnp ko value in ustatus" + str(nnpal))
-        #print("radikoban")
+        # print("radikoban")
         # self.ids.userstatus.add_widget(MDLabel(text=str(self.logo_value + 100), halign="center"))
         self.ids.nnp_score.text = str(nnpal)
         print(UserStatus.ids)
@@ -222,7 +247,7 @@ class UserStatus(MDScreen):
     def gc(self):
         global gncn
         print("gc ko value in ustatus" + str(gncn))
-        #print("laudalasun")
+        # print("laudalasun")
         print(self.ids)
         self.ids.gc_score.text = str(gncn)
         print(UserStatus.ids)
@@ -256,10 +281,20 @@ class MyMainApp(MDApp):
         self.theme_cls.theme_style = "Light"
         # self.theme_cls.primary_palette = "Teal"
         return self.root_widget
+    def on_start(self):
+        res=requests.get("https://treasure-hunt-f490f.firebaseio.com/"+".json")
+        print("was it okay",res.ok)
+        data=json.loads(res.content.decode())
+        print(data)
+
 
     def recreate(self):
-        self.root.clear_widgets()
-        self.root.add_widget(Factory.FirstWindow())
+        self.root.ids.firstwindow.ids.thirdwindow.clear_widgets()
+        print(self.root.ids.firstwindow.ids)
+        # self.root.ids.firstwindow.add_widget(Factory.WindowManager())
+        self.root.ids.firstwindow.ids.thirdwindow.add_widget(Factory.ThirdWindow())
+        print(self.root.ids.firstwindow.ids.screen_manager.ids)
+        # self.root.ids.firstwindow.ids.thirdwindow.ids.mapview.add_widget(Factory.ForMap())
 
 
 if __name__ == "__main__":
