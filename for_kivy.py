@@ -10,7 +10,8 @@ MyKivyFile = '''
 
 
 WindowManager:
-    FirebaseLoginScreen:            
+    FirebaseLoginScreen:     
+        id:fls       
     FirstWindow:
         id:firstwindow
     AboutApp:
@@ -231,9 +232,6 @@ WindowManager:
     lon:root.my_lon if root.my_lat>0 else 85.36235332489015
     zoom:15
     double_tap_zoom:True    
-    on_zoom:
-        self.zoom=14 if self.zoom<14 else self.zoom
-        
     MapMarker:  
         id:blinker   
         default_blink_size: 25
@@ -274,6 +272,7 @@ WindowManager:
             text:"Center"
             on_release:
                 root.center_on(root.my_lat,root.my_lon)
+                root.zoom=18
         MDRaisedButton:
             text:"Back"
             on_release:

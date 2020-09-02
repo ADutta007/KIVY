@@ -20,18 +20,16 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.factory import Factory
 import requests
-from akivymd.uix.statusbarcolor import change_statusbar_color
+from json import dumps
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDRaisedButton, MDFlatButton
 from kivy.core.window import Window
-#import autoclass
-from jnius import autoclass
 global marker_coord
 picture = {1: "new_nepal.png", 2: "greencoin.png"}
 # marker_coord=[]
 # ran_coord=0
 # ----Java Classes For Google Login----#
-
+user_data=[]
 
 
 
@@ -85,10 +83,12 @@ class ForMap(MapView):
 
     @mainthread
     def on_location(self, *args, **kwargs):
+        global user_data
         self.my_lat = kwargs['lat']
         self.my_lon = kwargs['lon']
         self.my_alt = kwargs['altitude']
-        # print(self.my_lat,self.my_lon)
+
+
 
     def on_auth_status(self, general_status, status_message):
         if general_status == 'provider-enabled':
@@ -166,6 +166,13 @@ class ForMap(MapView):
                     self.dialog.open()
         except IndexError as e:
             print(e)
+        url= "https://treasure-hunt-f490f.firebaseio.com/Client_Location/"+ ".json"
+        #username=open(App.get_running_app().user_data_dir + "/username.txt","w").write(self.parent.root.ids.fls.ids.ctreate_account_screen.ids.username.text).close()
+        #print(username)
+        username=open(App.get_running_app().user_data_dir + "/user_file.txt","r").read().split("\n")[0]
+        json_code =dumps({username:{"lat": self.my_lat, "lon": self.my_lon}})
+        to_database=json.loads(json_code)
+        requests.patch(url=url,json=(to_database))
 
     def distance_meet(self, i):
         global marker_coord, gncn, nnpal
@@ -231,7 +238,6 @@ gncn = 0
 class ThirdWindow(MDScreen):
     pass
 
-
 class UserStatus(MDScreen):
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -286,6 +292,30 @@ class MyMainApp(MDApp):
         print("was it okay",res.ok)
         data=json.loads(res.content.decode())
         print(data)
+        print(dumps(res.content.decode()))
+        print(self.root.ids.fls.ids.sign_in_screen.ids.password.text)
+
+
+
+    def user_db(self,email,phone,username):
+        global user_data
+        self.user_file=App.get_running_app().user_data_dir + "/user_file.txt"
+        with open(self.user_file, "w") as f:
+            f.write(username+"\n"+email+"\n"+phone)
+            f.close()
+        with open(self.user_file, "r") as f:
+            user_data=f.read().split("\n")
+            f.close()
+        url= "https://treasure-hunt-f490f.firebaseio.com/Client_Info/"+ user_data[0] +".json"
+        json_code =dumps( {"email": user_data[1], "phone": int(user_data[2])})
+        to_database=json.loads(json_code)
+        requests.patch(url=url,json=(to_database))
+        print()
+
+
+
+
+
 
 
     def recreate(self):
